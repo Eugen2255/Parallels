@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(USE_DOUBLE "double or float type" OFF)
 
 if (USE_DOUBLE)
-    add_definitions(-DOUBLE)
+    add_definitions(-DDOUBLE)
     message(STATUS "Building with DOUBLE precision")
 else()
     message(STATUS "Building with FLOAT precision") 
