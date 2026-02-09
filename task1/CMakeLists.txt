@@ -13,5 +13,5 @@ else()
     message(STATUS "Building with FLOAT precision") 
 endif()
 
-add_executable(main task1.cpp)
+add_executable(task1 task1.cpp)
 
