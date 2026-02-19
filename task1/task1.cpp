@@ -3,7 +3,6 @@
 #include <cmath>
 #include <vector>
 
-//#define PI 3,14159265358979323846
 
 using type =
     #ifdef DOUBLE
@@ -21,25 +20,24 @@ int main() {
     type sum = 0;
 
     #ifdef DOUBLE
-    double step = 2.0 * M_PI / size;
+        double step = 2.0 * M_PI / size;
 
-    for (size_t i = 0; i < size; ++i) {
-        vec[i] = sin(step * i);
-        sum += vec[i];
-    }
-    std::cout << "Double: ";
+        for (size_t i = 0; i < size; ++i) {
+            vec[i] = sin(step * i);
+            sum += vec[i];
+        }
+        std::cout << "Double: ";
 
     #else
-    float step = 2.0f * M_PI / size;
+        float step = 2.0f * M_PI / size;
 
-    for (size_t i = 0; i != size; ++i) {
-        vec[i] = sinf(step * i);
-        sum += vec[i];
-    }
-    std::cout << "Float: ";
+        for (size_t i = 0; i != size; ++i) {
+            vec[i] = sinf(step * i);
+            sum += vec[i];
+        }
+        std::cout << "Float: ";
     #endif
     
-
     std::cout << "sum = " << sum << std::endl;
     return 0;
 }
