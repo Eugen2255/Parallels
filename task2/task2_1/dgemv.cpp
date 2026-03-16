@@ -1,5 +1,7 @@
 #include <iostream>
 #include <cstdio>
+#include <vector>
+#include <chrono>
 #include <omp.h>
 
 #ifndef M
@@ -7,6 +9,7 @@
 #endif
 int m = M;
 int n = m;
+
 /*
 * matrix_vector_product: Compute matrix-vector product c[m] = a[m][n] * b[n]
 */
@@ -19,9 +22,9 @@ void matrix_vector_product(double *a, double *b, double *c, int m, int n){
 }
 
 void run_serial() {
-    double* a = new double[m * n];
-    double* b = new double[n];
-    double* c = new double[m];
+    std::vector<double> a(m * n);
+    std::vector<double> b(n);
+    std::vector<double> c(m);
 
     for (int i = 0; i < m; ++i) {
         for (int j = 0; j < n; ++j)
@@ -31,15 +34,12 @@ void run_serial() {
     for (int j = 0; j < n; ++j)
         b[j] = j;
 
-    double t = omp_get_wtime();
-    matrix_vector_product(a, b, c, m, n);
-    t = omp_get_wtime() - t;
+    auto t_start = std::chrono::high_resolution_clock::now();
+    matrix_vector_product(a.data(), b.data(), c.data(), m, n);
+    auto t_end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = t_end - t_start;
 
-    std::cout << "Elapsed time (serial): " << t << " sec." << std::endl;
-
-    delete[] a;
-    delete[] b;
-    delete[] c;
+    std::cout << "Elapsed time (serial): " << elapsed.count() << " sec." << std::endl;
 }
 
 /* matrix_vector_product_omp: Compute matrix-vector product c[m] = a[m][n] * b[n] */
@@ -60,10 +60,10 @@ void matrix_vector_product_omp(double *a, double *b, double *c, int m, int n){
     }
 }
 
-void run_parallel() {
-    double* a = new double[m * n];
-    double* b = new double[n];
-    double* c = new double[m];
+double run_parallel() {
+    std::vector<double> a(m * n);
+    std::vector<double> b(n);
+    std::vector<double> c(m);
 
     // Параллельная инициализация массивов
     #pragma omp parallel
@@ -84,28 +84,30 @@ void run_parallel() {
     for (int j = 0; j < n; j++)
         b[j] = j;
 
-    double t = omp_get_wtime();
-    matrix_vector_product_omp(a, b, c, m, n);
-    t = omp_get_wtime() - t;
+    auto t_start = std::chrono::high_resolution_clock::now();
+    matrix_vector_product_omp(a.data(), b.data(), c.data(), m, n);
+    auto t_end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = t_end - t_start;
 
-    std::cout << "Elapsed time (parallel): " << t << " sec." << std::endl;
+    //std::cout << "Elapsed time (parallel): " << elapsed.count() << " sec." << std::endl;
 
-    delete[] a;
-    delete[] b;
-    delete[] c;
+    return elapsed.count();
 }
 
 int main(int argc, char **argv){
-    std::cout << "Matrix-vector product (c[m] = a[m, n] * b[n]; m = " << m 
-              << ", n = " << n << ")\n";
-    
-    size_t memory_bytes = (static_cast<size_t>(m) * n + m + n) * sizeof(double);
-    size_t memory_mib = memory_bytes / (1024 * 1024);
-    
-    std::cout << "Memory used: " << memory_mib << " MiB\n";
-    
-    run_serial();
-    run_parallel();
+    //std::cout << "Matrix-vector product (c[m] = a[m, n] * b[n]; m = " << m << ", n = " << n << ")\n";
+
+    int ntest = 50;
+    double tparallel = 0.0;
+    for(int i = 0; i < ntest; ++i){
+        //size_t memory_bytes = (static_cast<size_t>(m) * n + m + n) * sizeof(double);
+        //size_t memory_mib = memory_bytes / (1024 * 1024);
+        //std::cout << "Memory used: " <<   memory_mib << " MiB\n";
+        
+        //run_serial();
+        tparallel += run_parallel();
+    }
+    std::cout << "Avg time: " << tparallel / ntest << std::endl;
 
     return 0;
 }
