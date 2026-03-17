@@ -1,7 +1,3 @@
-// variant2.cpp
-// Вариант 2: одна параллельная секция на весь алгоритм
-// Компиляция: g++ -fopenmp -O3 -o equation_v2 variant2.cpp
-
 #include <iostream>
 #include <vector>
 #include <chrono>
